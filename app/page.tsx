@@ -98,7 +98,7 @@ export default function Component() {
             className="absolute inset-0 flex flex-col items-center justify-center bg-background z-50"
           >
             <motion.div
-              className="relative w-32 h-32 mb-4"
+              className="relative w-24 h-24 mb-4"
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.5, duration: 1 }}
@@ -111,7 +111,7 @@ export default function Component() {
               />
             </motion.div>
             <motion.h1
-              className="text-2xl font-bold"
+              className="text-xl font-bold"
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 1, duration: 1 }}
@@ -126,7 +126,7 @@ export default function Component() {
         initial={{ opacity: 0 }}
         animate={{ opacity: isLoading ? 0 : 1 }}
         transition={{ duration: 1, delay: 0.5 }}
-        className={`bg-background shadow-xl rounded-lg overflow-hidden ${isMobile ? 'w-full' : 'w-full max-w-sm'}`}
+        className={`bg-background shadow-xl rounded-lg overflow-hidden ${isMobile ? 'w-full max-w-[280px]' : 'w-full max-w-[320px]'}`}
       >
         <div className="relative pb-[150%]"> {/* 2:3 aspect ratio */}
           <img
@@ -147,12 +147,12 @@ export default function Component() {
             <span className="sr-only">Next photo</span>
           </button>
         </div>
-        <div className="p-3">
-          <h2 className="text-lg font-bold mb-1 truncate">{currentCollection.name}</h2>
+        <div className="p-2">
+          <h2 className="text-base font-bold mb-1 truncate">{currentCollection.name}</h2>
           <p className="text-xs text-muted-foreground mb-2">
             Photo {currentPhotoIndex + 1} of {currentCollection.photos.length}
           </p>
-          <div className="space-y-3">
+          <div className="space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-xs font-medium">
                 {currentPhotoIndex + 1}
@@ -161,7 +161,7 @@ export default function Component() {
                 value={[currentPhotoIndex]} 
                 max={currentCollection.photos.length - 1} 
                 step={1} 
-                className="w-[70%]"
+                className="w-[60%]"
                 onValueChange={(value) => setCurrentPhotoIndex(value[0])}
               />
               <span className="text-xs font-medium">
@@ -170,23 +170,23 @@ export default function Component() {
             </div>
             <div className="flex justify-between items-center">
               <button 
-                className="text-xl text-muted-foreground hover:text-foreground transition-colors"
+                className="text-lg text-muted-foreground hover:text-foreground transition-colors"
                 onClick={prevCollection}
               >
-                <SkipBack size={20} />
+                <SkipBack size={18} />
               </button>
               <button 
-                className="bg-primary text-primary-foreground rounded-full p-1.5 hover:bg-primary/90 transition-colors"
+                className="bg-primary text-primary-foreground rounded-full p-1 hover:bg-primary/90 transition-colors"
                 onClick={toggleSlideshow}
                 aria-label={isPlaying ? "Pause slideshow" : "Play slideshow"}
               >
-                {isPlaying ? <Pause size={20} /> : <Play size={20} />}
+                {isPlaying ? <Pause size={18} /> : <Play size={18} />}
               </button>
               <button 
-                className="text-xl text-muted-foreground hover:text-foreground transition-colors"
+                className="text-lg text-muted-foreground hover:text-foreground transition-colors"
                 onClick={nextCollection}
               >
-                <SkipForward size={20} />
+                <SkipForward size={18} />
               </button>
             </div>
             <div className="flex items-center">
