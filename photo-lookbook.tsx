@@ -4,8 +4,18 @@ import { SkipBack, SkipForward, Play, Pause } from 'lucide-react'
 import { motion, AnimatePresence } from "framer-motion"
 import Image from 'next/image'
 
+// Define interfaces for our data structures
+interface Photo {
+  url: string;
+}
+
+interface PhotoCollection {
+  name: string;
+  photos: Photo[];
+}
+
 export default function Component() {
-  const [photoCollections, setPhotoCollections] = useState([])
+  const [photoCollections, setPhotoCollections] = useState<PhotoCollection[]>([])
   const [currentCollectionIndex, setCurrentCollectionIndex] = useState(0)
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0)
   const [isPlaying, setIsPlaying] = useState(false)
@@ -16,7 +26,7 @@ export default function Component() {
   useEffect(() => {
     fetch('/api/photo-collections')
       .then(response => response.json())
-      .then(data => {
+      .then((data: PhotoCollection[]) => {
         setPhotoCollections(data)
         setIsLoading(false)
       })
@@ -36,13 +46,13 @@ export default function Component() {
 
   const nextPhoto = useCallback(() => {
     setCurrentPhotoIndex((prevIndex) => 
-      (prevIndex + 1) % photoCollections[currentCollectionIndex].photos.length
+      (prevIndex + 1) % (photoCollections[currentCollectionIndex]?.photos.length || 1)
     )
   }, [currentCollectionIndex, photoCollections])
 
   const prevPhoto = useCallback(() => {
     setCurrentPhotoIndex((prevIndex) => 
-      (prevIndex - 1 + photoCollections[currentCollectionIndex].photos.length) % photoCollections[currentCollectionIndex].photos.length
+      (prevIndex - 1 + (photoCollections[currentCollectionIndex]?.photos.length || 1)) % (photoCollections[currentCollectionIndex]?.photos.length || 1)
     )
   }, [currentCollectionIndex, photoCollections])
 
@@ -61,7 +71,7 @@ export default function Component() {
   }, [photoCollections])
 
   useEffect(() => {
-    let slideshowInterval
+    let slideshowInterval: NodeJS.Timeout
     if (isPlaying) {
       slideshowInterval = setInterval(() => {
         nextPhoto()
@@ -103,7 +113,7 @@ export default function Component() {
       >
         <div className="relative pb-[150%]"> {/* 2:3 aspect ratio */}
           <img
-            src={currentPhoto}
+            src={currentPhoto.url}
             alt={`Photo from ${currentCollection.name}`}
             className="absolute top-0 left-0 w-full h-full object-contain"
           />

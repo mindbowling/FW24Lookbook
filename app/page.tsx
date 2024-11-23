@@ -1,12 +1,14 @@
 'use client'
+
 import { useState, useEffect, useCallback } from 'react'
 import { Slider } from "@/components/ui/slider"
-import { SkipBack, SkipForward, Play, Pause } from "lucide-react"
+import { SkipBack, SkipForward, Play, Pause } from 'lucide-react'
 import { motion, AnimatePresence } from "framer-motion"
 import Image from 'next/image'
+import { PhotoCollection } from '@/types/photo-lookbook'
 
 export default function Component() {
-  const [photoCollections, setPhotoCollections] = useState([])
+  const [photoCollections, setPhotoCollections] = useState<PhotoCollection[]>([])
   const [currentCollectionIndex, setCurrentCollectionIndex] = useState(0)
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0)
   const [isPlaying, setIsPlaying] = useState(false)
@@ -17,7 +19,7 @@ export default function Component() {
   useEffect(() => {
     fetch('/api/photo-collections')
       .then(response => response.json())
-      .then(data => setPhotoCollections(data))
+      .then((data: PhotoCollection[]) => setPhotoCollections(data))
 
     const checkMobile = () => setIsMobile(window.innerWidth < 640)
     checkMobile()
@@ -34,18 +36,21 @@ export default function Component() {
   }, [])
 
   const nextPhoto = useCallback(() => {
+    if (photoCollections.length === 0) return
     setCurrentPhotoIndex((prevIndex) => 
       (prevIndex + 1) % photoCollections[currentCollectionIndex].photos.length
     )
   }, [currentCollectionIndex, photoCollections])
 
   const prevPhoto = useCallback(() => {
+    if (photoCollections.length === 0) return
     setCurrentPhotoIndex((prevIndex) => 
       (prevIndex - 1 + photoCollections[currentCollectionIndex].photos.length) % photoCollections[currentCollectionIndex].photos.length
     )
   }, [currentCollectionIndex, photoCollections])
 
   const nextCollection = useCallback(() => {
+    if (photoCollections.length === 0) return
     setCurrentCollectionIndex((prevIndex) => 
       (prevIndex + 1) % photoCollections.length
     )
@@ -53,6 +58,7 @@ export default function Component() {
   }, [photoCollections])
 
   const prevCollection = useCallback(() => {
+    if (photoCollections.length === 0) return
     setCurrentCollectionIndex((prevIndex) => 
       (prevIndex - 1 + photoCollections.length) % photoCollections.length
     )
@@ -60,14 +66,14 @@ export default function Component() {
   }, [photoCollections])
 
   useEffect(() => {
-    let slideshowInterval
-    if (isPlaying) {
+    let slideshowInterval: NodeJS.Timeout
+    if (isPlaying && photoCollections.length > 0) {
       slideshowInterval = setInterval(() => {
         nextPhoto()
       }, 5000 - (slideshowSpeed * 45))
     }
     return () => clearInterval(slideshowInterval)
-  }, [isPlaying, slideshowSpeed, nextPhoto])
+  }, [isPlaying, slideshowSpeed, nextPhoto, photoCollections])
 
   const toggleSlideshow = () => {
     setIsPlaying(!isPlaying)
@@ -124,7 +130,7 @@ export default function Component() {
       >
         <div className="relative pb-[150%]"> {/* 2:3 aspect ratio */}
           <img
-            src={currentPhoto}
+            src={currentPhoto.url}
             alt={`Photo from ${currentCollection.name}`}
             className="absolute top-0 left-0 w-full h-full object-contain"
           />

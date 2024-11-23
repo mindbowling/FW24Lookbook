@@ -1,12 +1,22 @@
 import { promises as fs } from 'fs'
 import path from 'path'
+import type { NextApiRequest, NextApiResponse } from 'next'
+import { PhotoCollection } from '@/types/photo-lookbook'
 
-export default async function handler(req, res) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<PhotoCollection[] | { error: string }>
+) {
+  if (req.method !== 'GET') {
+    res.status(405).json({ error: 'Method not allowed' })
+    return
+  }
+
   try {
     const imagesDirectory = path.join(process.cwd(), 'public/images')
     const orderFilePath = path.join(process.cwd(), 'directory-order.txt')
     
-    let orderedDirectories = []
+    let orderedDirectories: string[] = []
     try {
       const orderFileContent = await fs.readFile(orderFilePath, 'utf8')
       orderedDirectories = orderFileContent.split('\n').map(dir => dir.trim()).filter(Boolean)
@@ -22,9 +32,9 @@ export default async function handler(req, res) {
   }
 }
 
-async function getPhotoCollections(directory, orderedDirectories) {
+async function getPhotoCollections(directory: string, orderedDirectories: string[]): Promise<PhotoCollection[]> {
   const entries = await fs.readdir(directory, { withFileTypes: true })
-  let collections = []
+  let collections: PhotoCollection[] = []
 
   for (const entry of entries) {
     if (entry.isDirectory()) {
@@ -32,7 +42,7 @@ async function getPhotoCollections(directory, orderedDirectories) {
       const photos = await getPhotosInDirectory(collectionPath)
       collections.push({
         name: entry.name,
-        photos: photos.map(photo => `/images/${entry.name}/${photo}`)
+        photos: photos.map(photo => ({ url: `/images/${entry.name}/${photo}` }))
       })
     }
   }
@@ -52,7 +62,7 @@ async function getPhotoCollections(directory, orderedDirectories) {
   return collections
 }
 
-async function getPhotosInDirectory(directory) {
+async function getPhotosInDirectory(directory: string): Promise<string[]> {
   const files = await fs.readdir(directory)
   return files.filter(file => 
     /\.(jpg|jpeg|png|gif)$/i.test(file)
